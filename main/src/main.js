@@ -3,10 +3,10 @@ import { generateShortCode, throwIfMissing } from './utils.js';
 
 export default async ({ res, req, log, error }) => {
   throwIfMissing(process.env, [
-    '758864a5964046685133c6d8a55d320ea493de1b0edc9492231883554e5a7200dfd2e6d9aed00defdec0ca3d32830c761c48c6b2626659abb1d09bcc992f98f84a73ce31566400d77f70c696e56b02e5f219ae8d9030771780771d96b7b540bbf884661a02313d4845ec3057530842e35f06f743e215588b0aa483913c5abc5f',
-    '666926460035dca8000d',
-    '6669267e000a824e00b9',
-    'https://url-shortner.io',
+    'APPWRITE_API_KEY',
+    'APPWRITE_DATABASE_ID',
+    'APPWRITE_COLLECTION_ID',
+    'SHORT_BASE_URL',
   ]);
 
   const appwrite = new AppwriteService();
