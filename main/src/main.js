@@ -40,11 +40,11 @@ export default async ({ res, req, log, error }) => {
     //generate qr code
     try{
       const shortenedURL =  new URL(urlEntry.$id, process.env.SHORT_BASE_URL).toString()
-      const qrCodeFileId = await appwrite.generateQRCode(shortenedURL);
+      // const qrCodeFileId = await appwrite.generateQRCode(shortenedURL);
       return res.json({
         short: shortenedURL,
         short_code: urlEntry.$id,
-        qrCodeFileId: qrCodeFileId
+        // qrCodeFileId: qrCodeFileId
       });
     }
     catch (err) {
