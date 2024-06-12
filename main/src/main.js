@@ -1,5 +1,6 @@
 import AppwriteService from './appwrite.js';
 import { generateShortCode, throwIfMissing } from './utils.js';
+import cors from 'cors';
 
 
 export default async ({ res, req, log, error }) => {
@@ -11,6 +12,7 @@ export default async ({ res, req, log, error }) => {
   ]);
   
   const appwrite = new AppwriteService();
+  app.use(cors());
 
   if (
     req.method === 'POST' &&
