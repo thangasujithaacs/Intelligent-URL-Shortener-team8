@@ -11,6 +11,7 @@ export default async ({ res, req, log, error }) => {
     'SHORT_BASE_URL',
   ]);
   const appwrite = new AppwriteService();
+  console.log(req.method)
     try {
       throwIfMissing(req.body, ['url']);
       new URL(req.body.url);
