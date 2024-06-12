@@ -48,6 +48,9 @@ class AppwriteService {
    */
   async createURLEntry(url, shortCode) {
     try {
+      console.log('Attempting to create document with URL:', url, 'and shortCode:', shortCode);
+      console.log('Using Database ID:', process.env.APPWRITE_DATABASE_ID);
+      console.log('Using Collection ID:', process.env.APPWRITE_COLLECTION_ID);
       const document = /** @type {URLEntryDocument} */ (
         await this.databases.createDocument(
           process.env.APPWRITE_DATABASE_ID,
@@ -58,11 +61,11 @@ class AppwriteService {
           }
         )
       );
-
+      console.log('Document created successfully:', document);
       return document;
     } catch (err) {
       if (err.code !== 409) throw err;
-      return null;
+      return err;
     }
   }
 
