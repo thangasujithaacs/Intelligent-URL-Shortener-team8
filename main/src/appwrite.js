@@ -1,4 +1,6 @@
-import { Client, Databases } from 'node-appwrite';
+import { Client, Databases, Storage } from 'node-appwrite';
+import QRCode from 'qrcode';
+import { promises as fs } from 'fs';
 
 /**
  * @typedef {Object} URLEntry
@@ -18,8 +20,27 @@ class AppwriteService {
       .setKey(process.env.APPWRITE_API_KEY);
 
     this.databases = new Databases(client);
+    const storage = new Storage(client);
   }
 
+  async generateQRCode(shortenedURL) {
+    try {
+        // Generate QR code image
+        const qrCodeBuffer = await QRCode.toBuffer(shortenedURL);
+
+        // Save QR code image to file
+        await fs.writeFile('/tmp/qrcode.png', qrCodeBuffer);
+
+        // Upload QR code image to Appwrite storage
+        const file = await storage.createFile('/tmp/qrcode.png', ['*'], ['*']);
+
+        return file.$id; // Return the file ID of the uploaded image
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+        throw error;
+    }
+  }
+ 
   /**
    * @param {string} shortCode
    * @returns {Promise<URLEntryDocument | null>}
@@ -112,6 +133,8 @@ class AppwriteService {
       if (err.code !== 409) throw err;
     }
   }
+
+  
 }
 
 export default AppwriteService;
