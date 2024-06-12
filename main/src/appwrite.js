@@ -20,7 +20,7 @@ class AppwriteService {
       .setKey(process.env.APPWRITE_API_KEY);
 
     this.databases = new Databases(client);
-    const storage = new Storage(client);
+    this.storage = new Storage(client);
   }
 
   async generateQRCode(shortenedURL) {
