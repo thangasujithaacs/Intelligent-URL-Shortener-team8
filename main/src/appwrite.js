@@ -69,6 +69,46 @@ class AppwriteService {
     }
   }
 
+  // /**
+  //  * @returns {Promise<URLEntryDocument[]>}
+  //  */
+  // async listURLEntries() {
+  //   try {
+  //     const response = await this.databases.listDocuments(
+  //       process.env.APPWRITE_DATABASE_ID,
+  //       process.env.APPWRITE_COLLECTION_ID
+  //     );
+  //     return response.documents;
+  //   } catch (err) {
+  //     console.error('Error listing URL entries:', err);
+  //     throw err;
+  //   }
+  // }
+
+  /**
+   * @param {string} shortId
+   * @param {Object} updates
+   * @param {string} [updates.newShortCode]
+   * @param {string} [updates.expirationDate]
+   * @returns {Promise<URLEntryDocument | null>}
+   */
+  async updateURLEntry(shortId, updates) {
+    try {
+      const document = /** @type {URLEntryDocument} */ (
+        await this.databases.updateDocument(
+          process.env.APPWRITE_DATABASE_ID,
+          process.env.APPWRITE_COLLECTION_ID,
+          shortId,
+          updates
+        )
+      );
+      return document;
+    } catch (err) {
+      console.error('Error updating URL entry:', err);
+      throw err;
+    }
+  }
+
   /**
    * @returns {Promise<boolean>}
    */

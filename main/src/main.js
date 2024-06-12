@@ -43,6 +43,33 @@ export default async ({ res, req, log, error }) => {
     });
   }
 
+  // if (req.method === 'GET' && req.path === '/list') {
+  //   const urlEntries = await appwrite.listURLEntries();
+  //   return res.json({ ok: true, urls: urlEntries });
+  // }
+  
+  if (req.method === 'PATCH' && req.headers['content-type'] === 'application/json') {
+    try {
+      throwIfMissing(req.body, ['shortId']);
+      const updates = {};
+      if (req.body.newShortCode) {
+        updates.shortCode = req.body.newShortCode;
+      }
+      if (req.body.expirationDate) {
+        updates.expirationDate = req.body.expirationDate;
+      }
+      const updatedEntry = await appwrite.updateURLEntry(req.body.shortId, updates);
+      if (!updatedEntry) {
+        error('Failed to update URL entry.');
+        return res.json({ ok: false, error: 'Failed to update URL entry' }, 500);
+      }
+      return res.json({ ok: true, url: updatedEntry });
+    } catch (err) {
+      error(err.message);
+      return res.send({ ok: false, error: err.message }, 400);
+    }
+  }
+
   const shortId = req.path.replace(/^(\/)|(\/)$/g, '');
   log(`Fetching document from with ID: ${shortId}`);
 
