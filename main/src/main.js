@@ -12,7 +12,7 @@ export default async ({ res, req, log, error }) => {
   ]);
   
   const appwrite = new AppwriteService();
-  app.use(cors());
+  app.use(cors({ origin: '*' }));
 
   if (
     req.method === 'POST' &&
