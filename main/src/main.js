@@ -32,6 +32,26 @@ export default async ({ res, req, log, error }) => {
       error('Failed to create url entry.');
       return res.json({ success: false, error: 'Failed to create url entry' }, 500);
     }
+
+    if (req.method === 'GET' && req.path.startsWith('/analytics/')) {
+      const shortId = req.path.replace(/^\/analytics\//, '');
+      const analyticsData = await appwrite.getAnalyticsData(shortId);
+  
+      if (!analyticsData) {
+        return res.send('Failed to fetch analytics data.', 500);
+      }
+  
+      return res.json({ ok: true, data: analyticsData });
+    }
+
+    const analyticsData = {
+      geoLocation: req.headers['x-appwrite-locale'] || 'unknown',
+      deviceType: req.headers['user-agent'] || 'unknown',
+      referrer: req.headers['referer'] || 'direct',
+    };
+  
+    // Log the click
+    await appwrite.logClick(shortId, analyticsData);
     
     //generate qr code
     try{
@@ -47,6 +67,5 @@ export default async ({ res, req, log, error }) => {
       error(err.message);
       return res.send({ success: false, error: err.message }, 400);
     }
-    
-    
+
 };
