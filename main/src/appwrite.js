@@ -170,8 +170,85 @@ class AppwriteService {
         'url',
         true
       );
+      await this.databases.createIntegerAttribute(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        'clicks',
+        false,
+        0
+      );
+      await this.databases.createStringAttribute(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        'geoLocation',
+        false
+      );
+      await this.databases.createStringAttribute(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        'deviceType',
+        false
+      );
+      await this.databases.createStringAttribute(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        'referrer',
+        false
+      );
     } catch (err) {
       if (err.code !== 409) throw err;
+    }
+  }
+
+  
+  /**
+   * @param {string} shortCode
+   * @param {Object} analyticsData
+   * @param {string} analyticsData.geoLocation
+   * @param {string} analyticsData.deviceType
+   * @param {string} analyticsData.referrer
+   * @returns {Promise<void>}
+   */
+  async logClick(shortCode, analyticsData) {
+    try {
+      const urlEntry = await this.getURLEntry(shortCode);
+      if (!urlEntry) {
+        throw new Error('URL entry not found');
+      }
+
+      const updatedDocument = await this.databases.updateDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        shortCode,
+        {
+          clicks: urlEntry.clicks + 1,
+          geoLocation: analyticsData.geoLocation,
+          deviceType: analyticsData.deviceType,
+          referrer: analyticsData.referrer
+        }
+      );
+      return updatedDocument;
+    } catch (err) {
+      console.error('Failed to log click:', err);
+    }
+  }
+
+  /**
+   * @param {string} shortCode
+   * @returns {Promise<Object>}
+   */
+  async getAnalyticsData(shortCode) {
+    try {
+      const document = await this.databases.getDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        shortCode
+      );
+
+      return document;
+    } catch (err) {
+      console.error('Failed to fetch analytics data:', err);
+      return null;
     }
   }
 
