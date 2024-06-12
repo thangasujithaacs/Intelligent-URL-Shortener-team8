@@ -10,21 +10,6 @@ export default async ({ res, req, log, error }) => {
     'APPWRITE_COLLECTION_ID',
     'SHORT_BASE_URL',
   ]);
-  // if (req.method === 'OPTIONS') {
-  //   res.setHeader('Access-Control-Allow-Origin', '*');
-  //   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  //   res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-  //   res.status(204).send('');
-  //   return;
-  // }
-
-  // Set CORS headers for the actual request
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  const appwrite = new AppwriteService();
-  // app.use(cors({ origin: '*' }));
 
   if (
     req.method === 'POST' &&
