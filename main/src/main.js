@@ -29,7 +29,7 @@ export default async ({ res, req, log, error }) => {
     const urlEntry = await appwrite.createURLEntry(
       req.body.url,
       req.body.shortCode ?? generateShortCode(),
-      expirationDate // Pass expiration date to the createURLEntry method
+      req.body.expirationDate // Pass expiration date to the createURLEntry method
     );
     
     if (!urlEntry) {

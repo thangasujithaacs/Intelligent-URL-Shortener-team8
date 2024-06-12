@@ -68,7 +68,7 @@ class AppwriteService {
    * @param {string} shortCode
    * @returns {Promise<URLEntryDocument | null>}
    */
-  async createURLEntry(url, shortCode) {
+  async createURLEntry(url, shortCode, expirationDate) {
     try {
       console.log('Attempting to create document with URL:', url, 'and shortCode:', shortCode);
       console.log('Using Database ID:', process.env.APPWRITE_DATABASE_ID);
@@ -79,7 +79,7 @@ class AppwriteService {
           "6669267e000a824e00b9",
           shortCode,
           {
-            url,
+            url,expirationDate
           }
         )
       );
