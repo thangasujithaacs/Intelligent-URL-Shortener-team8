@@ -1,6 +1,7 @@
 import { Client, Databases, Storage } from 'node-appwrite';
 import QRCode from 'qrcode';
 import { promises as fs } from 'fs';
+import { Readable } from 'stream';
 
 /**
  * @typedef {Object} URLEntry
