@@ -39,7 +39,7 @@ export default async ({ res, req, log, error }) => {
       // const qrCodeFileId = await appwrite.generateQRCode(shortenedURL);
       return res.json({
         short: shortenedURL,
-        short_code: urlEntry.$id,
+        short_code: req.body.shortCode,
         // qrCodeFileId: qrCodeFileId
       });
     }
