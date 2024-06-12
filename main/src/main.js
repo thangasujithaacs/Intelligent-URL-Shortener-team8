@@ -71,3 +71,9 @@ export default async ({ res, req, log, error }) => {
 
   return res.redirect(urlEntry.url);
 };
+
+if (req.method === 'GET' && req.path === '/list') {
+    // List all URL entries
+    const urlEntries = await appwrite.listURLEntries();
+    return res.json({ ok: true, urls: urlEntries });
+  }
