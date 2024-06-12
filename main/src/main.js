@@ -11,10 +11,23 @@ export default async ({ res, req, log, error }) => {
     'SHORT_BASE_URL',
   ]);
   const appwrite = new AppwriteService();
-  if (
-    (req.method === 'POST' || req.method === 'OPTIONS') && (
-    req.headers['content-type'] === 'application/json'
-  ) ){
+    if (req.method === 'GET'){
+
+      const shortId = req.path.replace(/^(\/)|(\/)$/g, '');
+      log(`Fetching document with ID: ${shortId}`);
+
+      const urlEntry = await appwrite.getURLEntry(shortId);
+
+      if (!urlEntry) {
+        return res.send('Invalid link.', 404);
+      }
+
+      if (urlEntry.expirationDate && new Date() > new Date(urlEntry.expirationDate)) {
+        return res.send('This link has expired.', 410); // 410 - Gone status code indicates the resource is no longer available
+      }
+
+      return res.redirect(urlEntry.url); 
+    }
     try {
       throwIfMissing(req.body, ['url']);
       new URL(req.body.url);
@@ -51,20 +64,5 @@ export default async ({ res, req, log, error }) => {
       return res.send({ success: false, error: err.message }, 400);
     }
     
-  }
-
-  const shortId = req.path.replace(/^(\/)|(\/)$/g, '');
-  log(`Fetching document with ID: ${shortId}`);
-
-  const urlEntry = await appwrite.getURLEntry(shortId);
-
-  if (!urlEntry) {
-    return res.send('Invalid link.', 404);
-  }
-
-  if (urlEntry.expirationDate && new Date() > new Date(urlEntry.expirationDate)) {
-    return res.send('This link has expired.', 410); // 410 - Gone status code indicates the resource is no longer available
-  }
-
-  return res.redirect(urlEntry.url);
+    
 };
