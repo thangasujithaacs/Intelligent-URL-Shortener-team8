@@ -23,11 +23,15 @@ export default async ({ res, req, log, error }) => {
       error(err.message);
       return res.send({ ok: false, error: err.message }, 400);
     }
+    const expirationDate = req.body.expirationDate || null; // Extract expiration date from request body
+
     console.log("Hello, world!");
     const urlEntry = await appwrite.createURLEntry(
       req.body.url,
-      req.body.shortCode ?? generateShortCode()
+      req.body.shortCode ?? generateShortCode(),
+      expirationDate // Pass expiration date to the createURLEntry method
     );
+    
     if (!urlEntry) {
       error('Failed to create url entry.');
       return res.json({ success: false, error: 'Failed to create url entry' }, 500);
@@ -51,12 +55,16 @@ export default async ({ res, req, log, error }) => {
   }
 
   const shortId = req.path.replace(/^(\/)|(\/)$/g, '');
-  log(`Fetching document from with ID: ${shortId}`);
+  log(`Fetching document with ID: ${shortId}`);
 
   const urlEntry = await appwrite.getURLEntry(shortId);
 
   if (!urlEntry) {
     return res.send('Invalid link.', 404);
+  }
+
+  if (urlEntry.expirationDate && new Date() > new Date(urlEntry.expirationDate)) {
+    return res.send('This link has expired.', 410); // 410 - Gone status code indicates the resource is no longer available
   }
 
   return res.redirect(urlEntry.url);
