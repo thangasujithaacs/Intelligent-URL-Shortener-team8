@@ -10,11 +10,11 @@ export default async ({ res, req, log, error }) => {
     'APPWRITE_COLLECTION_ID',
     'SHORT_BASE_URL',
   ]);
-
+  const appwrite = new AppwriteService();
   if (
-    req.method === 'POST' &&
+    (req.method === 'POST' || req.method === 'OPTIONS') && (
     req.headers['content-type'] === 'application/json'
-  ) {
+  ) ){
     try {
       throwIfMissing(req.body, ['url']);
       new URL(req.body.url);
