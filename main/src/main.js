@@ -11,7 +11,7 @@ export default async ({ res, req, log, error }) => {
     'SHORT_BASE_URL',
   ]);
   const appwrite = new AppwriteService();
-  console.log(req.method)
+  // console.log(req.method)
     try {
       throwIfMissing(req.body, ['url']);
       new URL(req.body.url);
@@ -39,7 +39,7 @@ export default async ({ res, req, log, error }) => {
       // const qrCodeFileId = await appwrite.generateQRCode(shortenedURL);
       return res.json({
         short: shortenedURL,
-        short_code: urlEntry.$id,
+        shortCode: req.body.shortCode,
         // qrCodeFileId: qrCodeFileId
       });
     }
