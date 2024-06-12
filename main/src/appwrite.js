@@ -28,22 +28,13 @@ class AppwriteService {
     try {
         // Generate QR code image
         const qrCodeBuffer = await QRCode.toBuffer(shortenedURL);
-
+        const fileName = 'qr_code.png';
         // Save QR code image to file
-        await fs.writeFile('/tmp/qrcode.png', qrCodeBuffer);
-
-        // Upload QR code image to Appwrite storage
-        // const file = await storage.createFile('/tmp/qrcode.png', ['*'], ['*']);
-      //   const file = storage.createFile(
-      //     '66696eca000cdd114a29',
-      //     ID.unique(),
-      //     document.getElementById('uploader').files[0]
+        // await fs.writeFile('/tmp/qrcode.png', qrCodeBuffer);
+        const file = await this.storage.createFile('66696eca000cdd114a29', fileName, qrCodeBuffer, 'image/png');
       // );
-        const qrCodeStream = new Readable();
-        qrCodeStream.push(qrCodeBuffer);
-        qrCodeStream.push(null); // Signal end of stream
-
-        const file = await this.storage.createFile('[66696eca000cdd114a29', 'qrcode.png', qrCodeStream, 'image/png');
+       // Signal end of stream
+        // const file = await this.storage.createFile('[66696eca000cdd114a29', '/tmp/qrcode.png', qrCodeStream, 'image/png');
         return file.$id; // Return the file ID of the uploaded image
     } catch (error) {
         console.error('Error generating QR code:', error);
