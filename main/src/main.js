@@ -20,14 +20,14 @@ export default async ({ res, req, log, error }) => {
   // }
 
   // Set CORS headers for the actual request
-  // res.setHeader('Access-Control-Allow-Origin', '*');
-  // res.setHeader('Access-Control-Allow-Methods', 'POST');
-  // res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  // const appwrite = new AppwriteService();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const appwrite = new AppwriteService();
   // app.use(cors({ origin: '*' }));
 
   if (
-    (req.method === 'POST' || req.method === 'OPTIONS') &&
+    req.method === 'POST' &&
     req.headers['content-type'] === 'application/json'
   ) {
     try {
