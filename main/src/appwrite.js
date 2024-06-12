@@ -50,8 +50,8 @@ class AppwriteService {
     try {
       const document = /** @type {URLEntryDocument} */ (
         await this.databases.createDocument(
-          process.env.APPWRITE_DATABASE_ID,
-          process.env.APPWRITE_COLLECTION_ID,
+          "666926460035dca8000d",
+          "6669267e000a824e00b9",
           shortCode,
           {
             url,
