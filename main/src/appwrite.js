@@ -1,4 +1,7 @@
-import { Client, Databases } from 'node-appwrite';
+import { Client, Databases, Storage } from 'node-appwrite';
+import QRCode from 'qrcode';
+import { promises as fs } from 'fs';
+import { Readable } from 'stream';
 
 /**
  * @typedef {Object} URLEntry
@@ -18,8 +21,27 @@ class AppwriteService {
       .setKey(process.env.APPWRITE_API_KEY);
 
     this.databases = new Databases(client);
+    this.storage = new Storage(client);
   }
 
+  async generateQRCode(shortenedURL) {
+    try {
+        // Generate QR code image
+        const qrCodeBuffer = await QRCode.toBuffer(shortenedURL);
+        const fileName = 'qr_code.png';
+        // Save QR code image to file
+        // await fs.writeFile('/tmp/qrcode.png', qrCodeBuffer);
+        const file = await this.storage.createFile('66696eca000cdd114a29', fileName, qrCodeBuffer, 'image/png');
+      // );
+       // Signal end of stream
+        // const file = await this.storage.createFile('[66696eca000cdd114a29', '/tmp/qrcode.png', qrCodeStream, 'image/png');
+        return file.$id; // Return the file ID of the uploaded image
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+        throw error;
+    }
+  }
+ 
   /**
    * @param {string} shortCode
    * @returns {Promise<URLEntryDocument | null>}
@@ -46,7 +68,7 @@ class AppwriteService {
    * @param {string} shortCode
    * @returns {Promise<URLEntryDocument | null>}
    */
-  async createURLEntry(url, shortCode) {
+  async createURLEntry(url, shortCode, expirationDate) {
     try {
       console.log('Attempting to create document with URL:', url, 'and shortCode:', shortCode);
       console.log('Using Database ID:', process.env.APPWRITE_DATABASE_ID);
@@ -57,7 +79,7 @@ class AppwriteService {
           "6669267e000a824e00b9",
           shortCode,
           {
-            url,
+            url,expirationDate
           }
         )
       );
@@ -152,6 +174,8 @@ class AppwriteService {
       if (err.code !== 409) throw err;
     }
   }
+
+  
 }
 
 export default AppwriteService;

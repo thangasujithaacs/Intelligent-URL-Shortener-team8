@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "nanoid": "^5.0.7",
-    "node-appwrite": "^12.0.1"
+    "node-appwrite": "^12.0.1",
+    "qrcode": "^1.4.4",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "prettier": "^3.2.5"
