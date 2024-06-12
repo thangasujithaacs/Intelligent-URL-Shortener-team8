@@ -17,8 +17,8 @@ class AppwriteService {
       .setEndpoint(
         process.env.APPWRITE_ENDPOINT ?? 'https://cloud.appwrite.io/v1'
       )
-      .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
-      .setKey(process.env.APPWRITE_API_KEY);
+      .setProject('666920d300249f8d0648')
+      .setKey('758864a5964046685133c6d8a55d320ea493de1b0edc9492231883554e5a7200dfd2e6d9aed00defdec0ca3d32830c761c48c6b2626659abb1d09bcc992f98f84a73ce31566400d77f70c696e56b02e5f219ae8d9030771780771d96b7b540bbf884661a02313d4845ec3057530842e35f06f743e215588b0aa483913c5abc5f');
 
     this.databases = new Databases(client);
     this.storage = new Storage(client);
@@ -50,8 +50,8 @@ class AppwriteService {
     try {
       const document = /** @type {URLEntryDocument} */ (
         await this.databases.getDocument(
-          "666926460035dca8000d",
-          "6669267e000a824e00b9",
+          '666926460035dca8000d',
+          '6669267e000a824e00b9',
           shortCode
         )
       );
@@ -71,15 +71,19 @@ class AppwriteService {
   async createURLEntry(url, shortCode, expirationDate) {
     try {
       console.log('Attempting to create document with URL:', url, 'and shortCode:', shortCode);
-      console.log('Using Database ID:', process.env.APPWRITE_DATABASE_ID);
-      console.log('Using Collection ID:', process.env.APPWRITE_COLLECTION_ID);
+      console.log('Using Database ID:', '666926460035dca8000d');
+      console.log('Using Collection ID:', '6669267e000a824e00b9');
       const document = /** @type {URLEntryDocument} */ (
         await this.databases.createDocument(
-          "666926460035dca8000d",
-          "6669267e000a824e00b9",
+          '666926460035dca8000d',
+          '6669267e000a824e00b9',
           shortCode,
           {
-            url,expirationDate
+            url,
+            clicks: 0,
+            geoLocation: '',
+            deviceType: '',
+            referrer: ''
           }
         )
       );
@@ -136,7 +140,7 @@ class AppwriteService {
    */
   async doesURLEntryDatabaseExist() {
     try {
-      await this.databases.get(process.env.APPWRITE_DATABASE_ID);
+      await this.databases.get('666926460035dca8000d');
       return true;
     } catch (err) {
       if (err.code !== 404) throw err;
@@ -147,7 +151,7 @@ class AppwriteService {
   async setupURLEntryDatabase() {
     try {
       await this.databases.create(
-        process.env.APPWRITE_DATABASE_ID,
+        '666926460035dca8000d',
         'URL Shortener'
       );
     } catch (err) {
@@ -156,8 +160,8 @@ class AppwriteService {
     }
     try {
       await this.databases.createCollection(
-        process.env.APPWRITE_DATABASE_ID,
-        process.env.APPWRITE_COLLECTION_ID,
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
         'URLs'
       );
     } catch (err) {
@@ -165,10 +169,35 @@ class AppwriteService {
     }
     try {
       await this.databases.createUrlAttribute(
-        process.env.APPWRITE_DATABASE_ID,
-        process.env.APPWRITE_COLLECTION_ID,
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
         'url',
         true
+      );
+      await this.databases.createIntegerAttribute(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        'clicks',
+        false,
+        0
+      );
+      await this.databases.createStringAttribute(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        'geoLocation',
+        false
+      );
+      await this.databases.createStringAttribute(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        'deviceType',
+        false
+      );
+      await this.databases.createStringAttribute(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        'referrer',
+        false
       );
     } catch (err) {
       if (err.code !== 409) throw err;
@@ -176,6 +205,56 @@ class AppwriteService {
   }
 
   
+  /**
+   * @param {string} shortCode
+   * @param {Object} analyticsData
+   * @param {string} analyticsData.geoLocation
+   * @param {string} analyticsData.deviceType
+   * @param {string} analyticsData.referrer
+   * @returns {Promise<void>}
+   */
+  async logClick(shortCode, analyticsData) {
+    try {
+      const urlEntry = await this.getURLEntry(shortCode);
+      if (!urlEntry) {
+        throw new Error('URL entry not found');
+      }
+
+      const updatedDocument = await this.databases.updateDocument(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        shortCode,
+        {
+          clicks: urlEntry.clicks + 1,
+          geoLocation: analyticsData.geoLocation,
+          deviceType: analyticsData.deviceType,
+          referrer: analyticsData.referrer
+        }
+      );
+      return updatedDocument;
+    } catch (err) {
+      console.error('Failed to log click:', err);
+    }
+  }
+
+  /**
+   * @param {string} shortCode
+   * @returns {Promise<Object>}
+   */
+  async getAnalyticsData(shortCode) {
+    try {
+      const document = await this.databases.getDocument(
+        '666926460035dca8000d',
+        '6669267e000a824e00b9',
+        shortCode
+      );
+
+      return document;
+    } catch (err) {
+      console.error('Failed to fetch analytics data:', err);
+      return null;
+    }
+  }
 }
 
 export default AppwriteService;

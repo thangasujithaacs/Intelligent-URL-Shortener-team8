@@ -1,15 +1,10 @@
 import AppwriteService from './appwrite.js';
 import { generateShortCode, throwIfMissing } from './utils.js';
-// import cors from 'cors';
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 export default async ({ res, req, log, error }) => {
-  throwIfMissing(process.env, [
-    'APPWRITE_API_KEY',
-    'APPWRITE_DATABASE_ID',
-    'APPWRITE_COLLECTION_ID',
-    'SHORT_BASE_URL',
-  ]);
+
   const appwrite = new AppwriteService();
   console.log(req.method)
     try {
@@ -19,9 +14,6 @@ export default async ({ res, req, log, error }) => {
       error(err.message);
       return res.send({ ok: false, error: err.message }, 400);
     }
-    const expirationDate = req.body.expirationDate || null; // Extract expiration date from request body
-
-    console.log("Hello, world!");
     const urlEntry = await appwrite.createURLEntry(
       req.body.url,
       req.body.shortCode ?? generateShortCode(),
@@ -47,6 +39,36 @@ export default async ({ res, req, log, error }) => {
       error(err.message);
       return res.send({ success: false, error: err.message }, 400);
     }
-    
-    
-};
+
+  }
+
+  if (req.method === 'GET' && req.path.startsWith('/analytics/')) {
+    const shortId = req.path.replace(/^\/analytics\//, '');
+    const analyticsData = await appwrite.getAnalyticsData(shortId);
+
+    if (!analyticsData) {
+      return res.send('Failed to fetch analytics data.', 500);
+    }
+
+    return res.json({ ok: true, data: analyticsData });
+  }
+
+  const shortId = req.path.replace(/^(\/)|(\/)$/g, '');
+  log(`Fetching document from with ID: ${shortId}`);
+
+  const urlEntry = await appwrite.getURLEntry(shortId);
+
+  if (!urlEntry) {
+    return res.send('Invalid link.', 404);
+  }
+
+  const analyticsData = {
+    geoLocation: req.headers['x-appwrite-locale'] || 'unknown',
+    deviceType: req.headers['user-agent'] || 'unknown',
+    referrer: req.headers['referer'] || 'direct',
+  };
+
+  // Log the click
+  await appwrite.logClick(shortId, analyticsData);
+
+  return res.redirect(urlEntry.url);
