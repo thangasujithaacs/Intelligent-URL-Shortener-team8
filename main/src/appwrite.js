@@ -30,7 +30,7 @@ class AppwriteService {
         await this.databases.getDocument(
           "666926460035dca8000d",
           "6669267e000a824e00b9",
-          shortCode
+          "SXyk41"
         )
       );
 
