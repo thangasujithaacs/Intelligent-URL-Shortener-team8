@@ -32,8 +32,17 @@ class AppwriteService {
         await fs.writeFile('/tmp/qrcode.png', qrCodeBuffer);
 
         // Upload QR code image to Appwrite storage
-        const file = await storage.createFile('/tmp/qrcode.png', ['*'], ['*']);
+        // const file = await storage.createFile('/tmp/qrcode.png', ['*'], ['*']);
+      //   const file = storage.createFile(
+      //     '66696eca000cdd114a29',
+      //     ID.unique(),
+      //     document.getElementById('uploader').files[0]
+      // );
+        const qrCodeStream = new Readable();
+        qrCodeStream.push(qrCodeBuffer);
+        qrCodeStream.push(null); // Signal end of stream
 
+        const file = await this.storage.createFile('[66696eca000cdd114a29', 'qrcode.png', qrCodeStream, 'image/png');
         return file.$id; // Return the file ID of the uploaded image
     } catch (error) {
         console.error('Error generating QR code:', error);
